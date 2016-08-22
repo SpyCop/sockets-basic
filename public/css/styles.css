@@ -1,3 +1,7 @@
+body {
+	background-color: #b1cabc;
+}
+
 .vertical-center {
 	min-height: 100vh;
 	margin: 0;
@@ -5,6 +9,16 @@
 	align-items: center;
 }
 
-.vertical-space {
-	margin-top: 20px;
+h1 {
+	margin: 24px 0;
+}
+
+.messages p {
+	margin: 6px 0;
+}
+
+.btn-custom {
+	color: #000;
+    background-color: #b1cabc;
+    border-color: #8DA196;
 }
