@@ -4,3 +4,7 @@
 	display: flex;
 	align-items: center;
 }
+
+.vertical-space {
+	margin-top: 20px;
+}
