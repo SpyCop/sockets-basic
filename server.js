@@ -4,6 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var moment = require('moment');
+var data = {};
 
 app.use(express.static(__dirname + '/public'));
 
@@ -18,12 +19,16 @@ function sendCurrentUsers(socket) {
 		return;
 	}
 
-	Object.keys(clientInfo).forEach(function (socketID) {
+	Object.keys(clientInfo).forEach(function(socketID) {
 		var userInfo = clientInfo[socketID];
 		if (info.room === userInfo.room) {
 			users.push(userInfo.name);
 		}
 	});
+
+	console.log(socket);
+	console.log("/\Socket\/")
+	console.log(io.sockets.connected);
 
 	socket.emit('message', {
 		name: "System",
@@ -32,10 +37,19 @@ function sendCurrentUsers(socket) {
 	});
 }
 
-io.on('connection', function (socket) {
+function checkWords(words) {
+	words.forEach(function(word) {
+		if (word === '@private') {
+			return true;
+		}
+	});
+	return false;
+}
+
+io.on('connection', function(socket) {
 	console.log('User connected via Socket.io');
 
-	socket.on('disconnect', function () {
+	socket.on('disconnect', function() {
 		var userData = clientInfo[socket.id];
 
 		if (typeof userData !== 'undefined') {
@@ -49,7 +63,7 @@ io.on('connection', function (socket) {
 		}
 	});
 
-	socket.on('joinRoom', function (req) {
+	socket.on('joinRoom', function(req) {
 		clientInfo[socket.id] = req;
 		socket.join(req.room);
 		socket.broadcast.to(req.room).emit('message', {
@@ -59,8 +73,9 @@ io.on('connection', function (socket) {
 		});
 	});
 
-	socket.on('message', function (message) {
-		console.log('Message received:' + message.name + '@' + moment.utc(message.timestamp).local().format('d/m/YYYY HH:mm') +': ' +  message.text);
+	socket.on('message', function(message) {
+		console.log('Message received:' + message.name + '@' + moment.utc(message.timestamp).local().format('d/m/YYYY HH:mm') + ': ' + message.text);
+		var receiverName;
 
 		if (message.text === '@currentUsers') {
 			sendCurrentUsers(socket);
@@ -77,6 +92,6 @@ io.on('connection', function (socket) {
 	});
 });
 
-http.listen(PORT, function () {
+http.listen(PORT, function() {
 	console.log('Server started');
 });
